@@ -102,7 +102,7 @@ function create(global_main)
 
   exitLabel = main
     :addLabel()
-    :setText("x")
+    :setText("\215")
     :setFontSize(1)
     :setTextAlign("center")
     :setForeground(colors.red)

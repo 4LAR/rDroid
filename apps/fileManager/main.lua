@@ -13,6 +13,27 @@ local path = "/"
 
 --------------------------------------------------------------------------------
 
+function tablelength(T)
+  local count = 0
+  for _ in pairs(T) do count = count + 1 end
+  return count
+end
+
+function bytesToSize(bytes)
+  local sizes = {"B", "KB", "MB", "GB", "TB"}
+  local i = 1
+  local size = bytes
+
+  while size >= 1024 and i < #sizes do
+    size = size / 1024
+    i = i + 1
+  end
+
+  return string.format("%.2f %s", size, sizes[i])
+end
+
+--------------------------------------------------------------------------------
+
 local function backFolder()
   local finalPath = ""
   local dir = ""
@@ -29,6 +50,10 @@ local function backFolder()
     end
   end
   path = finalPath
+end
+
+local function getSizeFolder(dir)
+  return tablelength(fs.list(dir))
 end
 
 local function openFolder(dir)
@@ -91,37 +116,48 @@ local function openFolder(dir)
         :setBackground(colors.white)
         :setForeground(colors.black)
 
-      filesTable[i]:addLabel()
-        :setPosition(5, 2)
-        :setText(file)
-        :setFontSize(1)
-        :setBackground(colors.white)
-        :setForeground(colors.gray)
-
       filesTable[i]:addPane()
         :setSize("parent.w", 1)
         :setPosition(1, 3)
         :setBackground(colors.white, "-", colors.lightGray)
 
+      local infoFile = ""
       if (typeIndex == 0) then
-        filesTable[i]:addLabel()
-          :setPosition(2, 1)
-          :setSize(2, 2)
-          -- :setText("\136\142\n\130\131")
-          :setText(" \144\n\143\133")
-          -- :setText("\141\142\n\143\143")
-          :setForeground(colors.yellow)
+          filesTable[i]:addLabel()
+            :setPosition(2, 1)
+            :setSize(2, 1)
+            :setText("\131")
+            :setForeground(colors.white)
+            :setBackground(colors.yellow)
+          filesTable[i]:addLabel()
+            :setPosition(2, 2)
+            :setSize(2, 1)
+            :setText("\131\131")
+            :setForeground(colors.yellow)
+            :setBackground(colors.white)
+        infoFile = getSizeFolder(dir .. "/" .. file) .. " entries"
       else
         filesTable[i]:addLabel()
           :setPosition(2, 1)
-          :setSize(2, 2)
-          -- :setText("\136\142\n\130\131")
-          :setText(" \144\n\143\133")
+          :setSize(2, 1)
+          :setText("\129")
+          :setForeground(colors.white)
+          :setBackground(colors.blue)
+        filesTable[i]:addLabel()
+          :setPosition(2, 2)
+          :setSize(2, 1)
+          :setText("\143\143")
           :setForeground(colors.blue)
+          :setBackground(colors.white)
+        infoFile = bytesToSize(fs.getSize(dir .. "/" .. file))
       end
 
-
-
+      filesTable[i]:addLabel()
+        :setPosition(5, 2)
+        :setText(infoFile)
+        :setFontSize(1)
+        :setBackground(colors.white)
+        :setForeground(colors.gray)
 
     -- fileListFrame:addLabel()
     --   :setPosition(1, backButtonFlag + i)
