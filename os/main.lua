@@ -1,4 +1,4 @@
-package.path = package.path .. ';/libs/basalt.lua'
+package.path = package.path .. ';/libs/?.lua'
 local basalt = require("basalt")
 local readJson = require("json")
 local topFrame = require("topFrame")

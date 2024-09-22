@@ -1,19 +1,7 @@
 package.path = package.path .. ';/libs/?.lua'
 local basalt = require("basalt")
--- local json = require("json")
-
-function read(filename)
-  local file = fs.open(filename, "r")
-  if not file then
-      print("Error reading: " .. filename)
-  end
-
-  local content = file.readAll()
-  file.close()
-
-  local data = textutils.unserialiseJSON(content)
-  return data
-end
+local json = require("json")
+local utils = require("utils")
 
 --------------------------------------------------------------------------------
 
@@ -23,6 +11,10 @@ local appsFrame = nil
 local appsTable = {}
 local appFrame = nil
 local exitLabel = nil
+
+--------------------------------------------------------------------------------
+
+-- colors.fromBlit("e")
 
 --------------------------------------------------------------------------------
 
@@ -64,13 +56,31 @@ local function listApps()
       )
     )
 
-    -- local appInfoJson = json.read(appsDirectory .. file .. "/info.json")
-    local appInfoJson = read(appsDirectory .. file .. "/info.json")
-
-    appsTable[i]:addPane()
-      :setSize(6, 4)
-      :setPosition(2, 1)
-      :setBackground(colors.blue, "#")
+    local appInfoJson = json.read(appsDirectory .. file .. "/info.json")
+    if (appInfoJson["icon"] == nil) then
+      appsTable[i]:addPane()
+        :setSize(6, 4)
+        :setPosition(2, 1)
+        :setBackground(colors.blue, "#")
+    else
+      for row = 1, 4 do
+        for col = 1, 6 do
+          local insertStr = appInfoJson["icon"][row][col]
+          if (
+            (string.len(insertStr) > 1)
+            and (string.sub(insertStr, 1, 1) == "\\")
+          ) then
+            insertStr = string.char(tonumber(string.sub(insertStr, 2, string.len(insertStr))))
+          end
+          appsTable[i]:addLabel()
+            :setPosition(2 + (col - 1), 1 + (row - 1))
+            :setFontSize(1)
+            :setText(insertStr)
+            :setBackground(utils.colors_dict[appInfoJson["icon_bg_color"][row][col]])
+            :setForeground(utils.colors_dict[appInfoJson["icon_fg_color"][row][col]])
+        end
+      end
+    end
 
     appsTable[i]:addLabel()
       :setText(appInfoJson["title"])
